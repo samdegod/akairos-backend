@@ -102,7 +102,7 @@ app.post('/sessoes', auth, async (req, res) => {
     try { evolucao = await gerarEvolucaoIA({ paciente: paciente?.nome||'Paciente', psi: psi?.nome||'Psicologa', abordagem: sessao.abordagem, numSessao: sessao.numSessao, data: sessao.data, texto: textoBase }); }
     catch (err) { console.error('Claude error:', err.message); }
   }
-  const prontuario = { id: randomUUID(), sessaoId: sessao.id, pacienteId, psiId: req.user.id, data: sessao.data, transcricao: transcricao||'', anotacoes: anotacoes||'', resumo: evolucao?.resumo||'', conteudo: evolucao?.conteudo||'', intervencoes: evolucao?.intervencoes||'', evolucaoClinica: evolucao?.evolucao_clinica||'', plano: evolucao?.plano||'', geradoPorIA: !!evolucao, criadoEm: new Date().toISOString(), atualizadoEm: new Date().toISOString() };
+  const prontuario = { id: randomUUID(), sessaoId: sessao.id, pacienteId, psiId: req.user.id, data: sessao.data, transcricao: transcricao||'', anotacoes: anotacoes||'', resumo: evolucao?.resumo||'', conteudo: evolucao?.conteudo||'', intervencoes: evolucao?.intervencoes||'', evolucaoClinica: evolucao?.evolucao_clinica||'', plano: evolucao?.plano||'', observacoes: req.body.observacoes||'', geradoPorIA: !!evolucao, criadoEm: new Date().toISOString(), atualizadoEm: new Date().toISOString() };
   db.get('prontuarios').push(prontuario).write();
   res.status(201).json({ sessao, prontuario });
 });
