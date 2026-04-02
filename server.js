@@ -456,6 +456,29 @@ Retorne JSON:
   return JSON.parse(cleaned);
 }
 
+// PATCH /psicologas/:id
+app.patch('/psicologas/:id', auth, async (req, res) => {
+  const psi = db.get('psicologas').find({ id: req.params.id });
+  if (!psi.value()) return res.status(404).json({ erro: 'Não encontrado' });
+  const update = { ...req.body };
+  if (update.senha) update.senha = await bcrypt.hash(update.senha, 10);
+  psi.assign(update).write();
+  const { senha, ...retorno } = psi.value();
+  res.json(retorno);
+});
+
+// POST /admin/reset - apaga todos os dados exceto psicólogas
+app.post('/admin/reset', auth, (req, res) => {
+  db.set('pacientes', []).write();
+  db.set('sessoes', []).write();
+  db.set('prontuarios', []).write();
+  db.set('agendamentos', []).write();
+  db.set('lancamentos', []).write();
+  db.set('espera', []).write();
+  console.log('⚠️  Reset realizado por', req.user.email);
+  res.json({ ok: true, mensagem: 'Dados apagados com sucesso' });
+});
+
 // ── Health check ──
 app.get('/health', (req, res) => {
   res.json({
